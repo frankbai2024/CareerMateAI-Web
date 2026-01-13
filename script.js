@@ -1,181 +1,61 @@
-console.log('CareerMate AI Landing Page loaded successfully! 🚀');
+// Mobile Menu Toggle
+const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+const mobileMenu = document.querySelector('.mobile-menu');
+const mobileLinks = document.querySelectorAll('.mobile-link');
 
-const backToButton = document.getElementById("backToTop")
+// Toggle mobile menu
+mobileMenuToggle.addEventListener('click', () => {
+    mobileMenuToggle.classList.toggle('active');
+    mobileMenu.classList.toggle('active');
+});
 
-if (backToButton) {
-    window.addEventListener('scroll', (event) => {
-        if (window.scrollY > 300) {
-            backToButton.classList.add('show');
-        } else {
-            backToButton.classList.remove('show')
-        }
-    })
+// Close mobile menu when clicking on a link
+mobileLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenuToggle.classList.remove('active');
+        mobileMenu.classList.remove('active');
+    });
+});
 
-    backToButton.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        })
-    })
-}
-
-const Formvalidator = {
-    rules: {
-        fullname: {
-            required: true,
-            minLength: 2,
-            message: "Please enter your full name at least 2 characters"
-        },
-        email: {
-            required: true,
-            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            message: "Please enter a valid email address"
-        },
-        message: {
-            required: true,
-            minLength: 10,
-            message: "Message must be at least 10 characters long"
-        },
-        terms: {
-            required: true,
-            message: 'You must agree to the terms of service'
-        }
-    },
-
-    validateField(field) {
-        const fieldName = field.name;
-        const fieldvalue = field.type === 'checkbox' ? field.checked: field.value.trim()
-        const rule = this.rules[fieldName]
-
-        if (!rule) return true;
-
-        if (rule.required) {
-            if (field.type === 'checkbox' && !fieldvalue) {
-                this.showError(field, rule.message)
-                return false
-            }
-            if (field.type !== 'checkbox' && !fieldvalue) {
-                this.showError(field, rule.message)
-                return false
-            }
-        }
-
-        if (!fieldvalue && !rule.required) {
-            this.showSuccess(field);
-            return true;
-        }
-
-        if (rule.minLength && fieldvalue.length < rule.minLength) {
-            this.showError(field, rule.message)
-            return false
-        }
-
-        // Pattern validation (for email)
-        if (rule.pattern && !rule.pattern.test(fieldvalue)) {
-            this.showError(field, rule.message);
-            return false;
-        }
-
-        this.showSuccess(field)
-        return true;
-    },
-
-    showError(field, message) {
-        const formGroup = field.closest('.form-group') || field.closest('.form-checkbox');
-
-        formGroup.classList.remove('success')
-        formGroup.classList.add('error')
-
-        const existingError = formGroup.querySelector('.error-message')
-        if (existingError) {
-            existingError.remove()
-        }
-
-        const errorDiv = document.createElement('div')
-        errorDiv.className = 'error-message'
-        errorDiv.innerHTML = `<span>⚠</span> ${message}`
-
-
-        if (field.type === 'checkbox') {
-            formGroup.appendChild(errorDiv);
-        } else {
-            field.parentNode.appendChild(errorDiv);
-        }
-    },
-
-    showSuccess(field) {
-        const formGroup = field.closest('.form-group') || field.closest('.form-checkbox');
-        formGroup.classList.remove('error')
-
-        if (field.value.trim() || field.checked) {
-            formGroup.classList.add('success')
-        }
-
-        const existingError = formGroup.querySelector('.error-message')
-        if (existingError) {
-            existingError.remove()
-        }
-    },
-
-    validForm(form, templateParams) {
-        let isValid = true;
-        const fieldsToValidate = form.querySelectorAll('[name="fullname"], [name="email"], [name="message"], [name="terms"]');
-
-        fieldsToValidate.forEach(field => {
-            if(!this.validateField(field)) {
-                isValid = false
-            }
-
-            if (field.type !== 'checkbox') {
-                templateParams[field.name] = field.value
-            }
-        })
-
-        return isValid
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+        mobileMenuToggle.classList.remove('active');
+        mobileMenu.classList.remove('active');
     }
-}
+});
 
-const init = () => {
-    console.log("this is working")
-    emailjs.init({publicKey: 'your public key'})
-}
-init();
-
-const contactForm = document.querySelector('.contact-form')
-if (contactForm) {
-    const validateFields = contactForm.querySelectorAll('[name="fullname"], [name="email"], [name="message"], [name="terms"]')
-
-    
-    validateFields.forEach(field => {
-        field.addEventListener('blur', function() {
-            Formvalidator.validateField(field);
-        })
-    })
-
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault()
-
-        const templateParams = {};
-        const isValid =Formvalidator.validForm(this, templateParams)
-        if (!isValid) {
-        
-            // Scroll to first error
-            const firstError = this.querySelector('.form-group.error, .form-checkbox.error');
-            if (firstError) {
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            return;
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
+    });
+});
 
-        const serviceID = "service key"
-        const templateID = "template key"
+// Back to Top Button
+const backToTopButton = document.getElementById('backToTop');
 
-        emailjs.send(serviceID, templateID, templateParams).then(() => {
-            console.log("this email send success")
-        }, (error) => {
-            console.log(error)
-            console.log("this error message")
-        });
+// Show/hide button based on scroll position
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        backToTopButton.classList.add('visible');
+    } else {
+        backToTopButton.classList.remove('visible');
+    }
+});
 
-    })
-}
+// Scroll to top when button is clicked
+backToTopButton.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
